@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#101a2a">
-  <meta name="description" content="นาฬิกาตั้งโต๊ะ แสดงเวลา วันที่ อากาศใกล้ตัว และเวลาปารีส">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="นาฬิกาตั้งโต๊ะ แสดงเวลา วันที่ อากาศใกล้ตัว เวลาทั่วโลก และข้อมูลดวงอาทิตย์กับดวงจันทร์">
   <title>นาฬิกาที่บ้าน</title>
   <style>
     :root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#f4f7fa;background:#101a2a;font-synthesis:none}
@@ -34,6 +34,80 @@
     @media(max-width:820px){.frame{grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto;gap:18px;min-height:100svh;padding:24px}.main{align-self:end}.time{font-size:clamp(96px,20vw,170px)}.aside{grid-column:1;align-self:start;justify-self:stretch;max-width:none;grid-template-columns:1fr 1fr;gap:12px}.card{border-radius:22px;padding:19px}.temp{font-size:clamp(44px,8vw,75px)}.paris-time{font-size:clamp(40px,7vw,60px)}.bottomline{align-self:end}.orb{width:190px;right:8%;top:10%}}
     @media(max-width:560px){.frame{gap:14px}.time{font-size:clamp(80px,21vw,125px)}.date{font-size:21px}.aside{grid-template-columns:1fr 1fr}.card{padding:16px}.weather-details{font-size:11px}.temp{font-size:44px}.paris-time{font-size:38px}.paris-date{font-size:11px}.bottomline{font-size:11px}.brand{letter-spacing:.16em}}
     @media(max-height:640px) and (min-width:821px){.frame{padding:24px 35px;gap:20px}.time{font-size:clamp(95px,17vw,180px)}.card{padding:20px}.aside{gap:12px}.temp{font-size:60px}.paris-time{font-size:45px}}
+    /* Nocturne draft: keep the background black and let time lead the page. */
+    body{background:#000}
+    #app{--accent:#bcbcbc;--weather-accent:#d7b876;background:#000}
+    #app.weather-clear{--weather-accent:#e1b96d}
+    #app.weather-cloud{--weather-accent:#aabfd1}
+    #app.weather-rain{--weather-accent:#82bbd6}
+    #app.weather-thunder{--weather-accent:#b9a7da}
+    #app.weather-snow{--weather-accent:#b1d9e0}
+    #app::before,#app .grain{display:none}
+    #app .orb{top:10%;right:8%;width:min(15vw,165px);opacity:.11;background:radial-gradient(circle,#c3c3c3 0,#777 35%,transparent 70%);box-shadow:none;filter:blur(18px);animation-duration:65s}
+    #app.is-night .orb{opacity:.045}
+    #app.weather-cloud .orb,#app.weather-rain .orb,#app.weather-snow .orb,#app.weather-thunder .orb{opacity:.025}
+    #app .cloud{z-index:0;background:#777;filter:blur(37px);opacity:0;animation-duration:90s}
+    #app.weather-cloud .cloud{opacity:.095}#app.weather-rain .cloud,#app.weather-thunder .cloud{opacity:.13}#app.weather-snow .cloud{opacity:.08}
+    #app .rainfield{z-index:0;background-image:repeating-linear-gradient(105deg,transparent 0 33px,#c6c6c62b 34px,#c6c6c62b 35px,transparent 36px 57px);opacity:0;animation-duration:2.8s}
+    #app.weather-rain .rainfield,#app.weather-thunder .rainfield{opacity:.32}
+    #app .stars{z-index:0;opacity:0;animation-duration:16s}
+    #app.weather-clear.is-night .stars{opacity:.16}
+    #app.weather-snow .stars{opacity:.13;animation:soft-snow 15s linear infinite}
+    @keyframes soft-snow{to{background-position:0 75px;opacity:.06}}
+    .frame{display:flex;flex-direction:column;gap:0;min-height:0;padding:clamp(22px,3vw,42px) clamp(24px,4vw,58px) 22px}
+    .topline{flex:0 0 auto}.brand,.status{color:#777;font-size:13px}
+    .main{flex:1;align-self:flex-start;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:0;width:calc(100% - 302px);text-align:left}
+    .eyebrow{display:none}
+    .clock-group{display:flex;flex-direction:column;align-items:center;width:max-content;max-width:100%}
+    .time{color:#e8e5dd;font-size:clamp(205px,29vw,390px);font-weight:260;line-height:.88;letter-spacing:-.075em;text-shadow:none;margin:0 0 15px}
+    .time .seconds{align-self:baseline;margin-left:.16em;color:#a8aaa9;font-size:clamp(30px,3.5vw,46px);font-weight:450;letter-spacing:0;font-variant-numeric:tabular-nums}
+    .date{color:#b9ced8;font-size:clamp(34px,4.1vw,60px);font-weight:450;line-height:1.15;text-align:center}
+    .date-english{margin-top:6px;color:#899ba4;font-size:clamp(18px,2.25vw,28px);font-weight:350;line-height:1.25;text-align:center}
+    .subdate{display:none}
+    .topline{justify-content:flex-start;gap:clamp(22px,4vw,56px);padding-right:245px}
+    .weather-corner{flex:0 1 350px;min-width:250px;padding-left:14px;border-left:2px solid var(--weather-accent)}
+    .weather-kicker{font-size:12px;font-weight:650;letter-spacing:.08em;color:var(--weather-accent)}
+    .weather-corner .city{display:inline;margin:0 0 0 9px;padding:0;border:0;color:#858585;font-size:11px;font-weight:400;letter-spacing:0}
+    .weather-summary{display:flex;align-items:center;gap:9px;margin-top:2px;white-space:nowrap}
+    .weather-corner .weather-mark{font-size:30px;line-height:1;color:var(--weather-accent);animation:weather-breathe 8s ease-in-out infinite alternate}
+    @keyframes weather-breathe{to{opacity:.63;transform:translateY(-2px)}}
+    .weather-corner .temp{display:inline;font-size:clamp(29px,3vw,40px);font-weight:320;letter-spacing:-.05em;color:var(--weather-accent);line-height:1}
+    .weather-corner .condition{display:inline;margin:0;color:#d6d2c8;font-size:clamp(13px,1.35vw,18px);vertical-align:baseline;overflow:hidden;text-overflow:ellipsis}
+    .weather-corner .weather-details{display:flex;flex-wrap:wrap;gap:3px 12px;margin-top:5px;color:#888;font-size:11px;line-height:1.25}
+    .weather-corner #rain-chance{color:#8fbccf}
+    .air-quality{--air-color:#8e9a9e;flex:0 0 190px;min-width:0;padding-left:14px;border-left:2px solid var(--air-color)}
+    .air-quality[data-level="good"]{--air-color:#8acdb0}.air-quality[data-level="moderate"]{--air-color:#e6cf86}.air-quality[data-level="sensitive"]{--air-color:#e7a974}.air-quality[data-level="unhealthy"]{--air-color:#dc8989}.air-quality[data-level="very-unhealthy"]{--air-color:#b99bda}.air-quality[data-level="hazardous"]{--air-color:#b9899e}
+    .air-title{color:var(--air-color);font-size:12px;font-weight:650;letter-spacing:.08em}
+    .air-main{display:flex;align-items:baseline;gap:6px;margin-top:2px;color:var(--air-color)}
+    .air-number{font-size:clamp(29px,3vw,40px);font-weight:320;line-height:1;font-variant-numeric:tabular-nums}
+    .air-unit{color:#aaa;font-size:12px;white-space:nowrap}
+    .air-level{display:flex;align-items:center;gap:8px;margin-top:4px;color:var(--air-color);font-size:12px;white-space:nowrap}
+    .air-bars{display:flex;align-items:end;gap:3px;height:15px;flex:none}.air-bars i{display:block;width:4px;height:var(--height);border-radius:2px;background:#343434}.air-bars i.is-active{background:var(--air-color)}
+    .air-note{margin-top:3px;color:#777;font-size:10px;white-space:nowrap}
+    .aside{flex:0 0 auto;align-self:stretch;justify-self:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:none;width:100%}
+    .card{min-height:124px;padding:14px 19px;border-radius:19px;background:#090909;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+    .sun-card{border-color:#46341e;background:linear-gradient(145deg,#0d0a06,#080808)}
+    .moon-card{border-color:#403d25;background:linear-gradient(145deg,#0c0c07,#080808)}
+    .lunar-card{border-color:#383044;background:linear-gradient(145deg,#0b090e,#080808)}
+    .lunar-card .astro-title{color:#c5b6de}.lunar-main{display:flex;align-items:baseline;gap:9px;margin-top:7px;white-space:nowrap}.lunar-date,.lunar-month{color:#e0d5ec;font-size:clamp(24px,2.45vw,32px);line-height:1.1}.wan-phra-status{display:inline-flex;align-items:center;margin-top:7px;padding:3px 8px;border:1px solid #383344;border-radius:999px;color:#b5a9c0;font-size:12px;line-height:1.2}.wan-phra-status.is-holy{border-color:#76633a;color:#f0d89a;background:#302511;box-shadow:0 0 14px #d7ae5433;animation:holy-breathe 8s ease-in-out infinite alternate}@keyframes holy-breathe{to{box-shadow:0 0 5px #d7ae5422}}
+    .world-clocks{position:absolute;top:clamp(22px,3vw,42px);right:clamp(24px,4vw,58px);width:290px;z-index:3}
+    .world-heading{color:#777;font-size:11px;letter-spacing:.17em;text-align:right;margin:0 0 6px}
+    .world-row{--zone-color:#a9cee3;display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid #242424}
+    .world-row[data-daylight="day"]{--zone-color:#e8d39b}.world-row[data-daylight="night"]{--zone-color:#a9cee3}
+    .world-city{color:var(--zone-color);font-size:14px;white-space:nowrap}.world-city-en{margin-left:4px;font-size:11px;font-weight:400;opacity:.78}.world-city small{display:block;margin-top:2px;color:color-mix(in srgb,var(--zone-color) 70%,#000);font-size:13px}.world-country-en{font-size:11px}.world-flag{display:inline-block;width:17px;height:12px;margin-right:5px;object-fit:cover;vertical-align:-1px;border:1px solid #ffffff4d;border-radius:2px}
+    .world-city::before{display:inline-block;width:15px;margin-right:3px;font-size:12px;vertical-align:1px}.world-row[data-daylight="day"] .world-city::before{content:"☀"}.world-row[data-daylight="night"] .world-city::before{content:"☾"}
+    .world-time{color:var(--zone-color);font-size:clamp(22px,2.2vw,29px);font-variant-numeric:tabular-nums;line-height:1.05;white-space:nowrap}
+    .astro-title{font-size:14px;letter-spacing:.1em;font-weight:650}.sun-card .astro-title,.sun-card .astro-time-value{color:#e3b472}.moon-card .astro-title,.moon-card .astro-time-value{color:#e3dba5}
+    .astro-compact{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);align-items:center;gap:8px;margin-top:9px}
+    .astro-times{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0}.astro-time-label{display:block;color:#9a907e;font-size:11px}.astro-time-value{display:block;margin-top:2px;font-size:clamp(22px,2.25vw,30px);line-height:1.1;font-variant-numeric:tabular-nums}
+    .sun-graphic{height:38px;position:relative;margin:0}.sun-horizon{position:absolute;left:0;right:0;bottom:6px;height:1px;background:linear-gradient(90deg,transparent,#8e6941 15%,#8e6941 85%,transparent)}.sun-orb{position:absolute;left:var(--sun-position,50%);top:3px;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:#e5b96f;box-shadow:0 0 17px #d4a05455;animation:sun-breathe 8s ease-in-out infinite alternate;transition:left 30s linear}@keyframes sun-breathe{to{opacity:.55;transform:translateY(3px)}}
+    .moon-main{display:flex;align-items:center;gap:5px;margin:0;min-width:0}.moon-disc{width:37px;height:37px;flex:none;border-radius:50%;background:#cabe8f;box-shadow:0 0 8px #cabe8f25;animation:moon-float 10s ease-in-out infinite alternate}@keyframes moon-float{to{transform:translateY(-4px)}}.moon-percent{color:#e4dca7;font-size:clamp(25px,2.3vw,30px);font-variant-numeric:tabular-nums;line-height:1}.moon-caption{font-size:9px;color:#a69f7b;margin-top:3px;line-height:1.15}
+    .bottomline{flex:0 0 auto;align-self:stretch;margin-top:12px;color:#666;font-size:12px}.icon-button{width:40px;height:40px;color:#a9a9a9;background:#101010;border-color:#282828}
+    .icon-button:hover{background:#1d1d1d}
+    #app.is-night .time{color:#bdb9af}#app.is-night .date{color:#91a9b4}#app.is-night .card{background:#050505}
+    @media(max-width:820px){.frame{padding:23px 25px 18px}.main{width:calc(100% - 205px)}.time{font-size:clamp(165px,27vw,250px)}.date{font-size:clamp(28px,4vw,38px)}.world-clocks{right:25px;top:23px;width:185px}.world-row{padding:5px 0}.world-city{font-size:14px}.world-time{font-size:22px}.aside{gap:8px}.card{min-height:140px;padding:12px}.astro-compact{display:block}.astro-times{margin-top:7px}.astro-time-value{font-size:21px}.sun-graphic{height:28px}.moon-disc{width:37px;height:37px}.moon-main{gap:5px}.moon-percent{font-size:25px}.moon-caption{font-size:9px}.lunar-main{display:block}.lunar-month{display:block;margin-top:3px}.bottomline{margin-top:10px}.topline{padding-right:205px;gap:16px}.weather-corner{flex-basis:300px;min-width:210px}.weather-corner .weather-details{font-size:10px}.air-quality{flex-basis:150px}.air-unit{font-size:10px}.air-note{font-size:9px}}
+    @media(max-width:560px){body{overflow:auto}.frame{height:auto;min-height:100svh;padding:18px 17px 14px}.topline{padding-right:0;gap:12px}.main{order:1;width:100%;min-height:230px}.time{font-size:clamp(120px,24vw,155px)}.date{font-size:clamp(24px,5vw,31px)}.world-clocks{order:2;position:static;width:100%;margin:0 0 18px}.world-heading{text-align:left}.world-row{padding:4px 0}.aside{order:3;grid-template-columns:1fr;gap:7px}.card{min-height:115px;padding:13px}.astro-compact{display:grid;grid-template-columns:1fr 1fr;margin-top:10px}.astro-times{margin-top:0}.astro-time-value{font-size:20px}.moon-disc{width:40px;height:40px}.moon-percent{font-size:23px}.lunar-main{display:flex}.lunar-month{display:inline;margin-top:0}.bottomline{order:4}.weather-corner{flex:1 1 auto;min-width:0;padding-left:9px}.weather-corner .weather-details{display:none}.weather-corner .city{display:block;margin:2px 0 0;font-size:10px}.weather-summary{gap:5px}.weather-corner .weather-mark{font-size:22px}.weather-corner .temp{font-size:25px}.weather-corner .condition{font-size:12px}.air-quality{flex:0 0 125px;padding-left:9px}.air-number{font-size:25px}.air-unit{font-size:9px}.air-note{white-space:normal;line-height:1.1}}
+    @media(max-height:640px) and (min-width:821px){.frame{padding:15px 28px 12px}.main{width:calc(100% - 220px)}.time{font-size:clamp(185px,24vw,300px)}.date{font-size:clamp(31px,3.3vw,44px)}.world-clocks{top:15px;right:28px;width:205px}.world-row{padding:4px 0}.card{min-height:112px;padding:10px 16px}.astro-compact{margin-top:6px}.sun-graphic{height:29px}.moon-disc{width:38px;height:38px}.weather-corner .weather-details{font-size:10px}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
   </style>
 </head>
@@ -41,41 +115,82 @@
   <div class="app weather-clear" id="app">
     <div class="orb" aria-hidden="true"></div><div class="cloud one" aria-hidden="true"></div><div class="cloud two" aria-hidden="true"></div><div class="rainfield" aria-hidden="true"></div><div class="stars" aria-hidden="true"></div><div class="grain" aria-hidden="true"></div>
     <main class="frame" id="frame">
-      <header class="topline"><div class="brand">A moment at home</div><div class="status" id="status" role="status">พร้อมใช้งาน</div></header>
-      <section class="main" aria-label="เวลาท้องถิ่น"><p class="eyebrow">เวลาที่บ้าน</p><h1 class="time"><span id="local-hours">--</span><span class="colon">:</span><span id="local-minutes">--</span></h1><div class="date" id="local-date">กำลังอ่านเวลา...</div><div class="subdate" id="local-subdate">พักสายตาสักครู่ แล้วมองออกไปนอกหน้าต่าง</div></section>
+      <header class="topline"><section class="weather-corner" aria-label="พยากรณ์อากาศ"><div class="weather-kicker">อากาศตอนนี้ <span class="city" id="city">กรุณาเปิดตำแหน่ง</span></div><div class="weather-summary"><span class="weather-mark" id="weather-icon" aria-hidden="true">◌</span><span class="temp" id="temperature">--°</span><span class="condition" id="condition">รอข้อมูลตำแหน่ง</span></div><div class="weather-details"><span id="feels">รู้สึกเหมือน --°</span><span id="range">สูงสุด --° · ต่ำสุด --°</span><span id="rain-chance">ฝน --%</span></div></section><section class="air-quality" id="air-quality" data-level="unknown" aria-label="ฝุ่น PM2.5"><div class="air-title">PM2.5 ในพื้นที่</div><div class="air-main"><span class="air-number" id="air-number">--</span><span class="air-unit">µg/m³</span></div><div class="air-level"><span class="air-bars" id="air-bars" aria-hidden="true"><i style="--height:5px"></i><i style="--height:7px"></i><i style="--height:9px"></i><i style="--height:11px"></i><i style="--height:13px"></i><i style="--height:15px"></i></span><span id="air-label">รอข้อมูล</span></div><div class="air-note" id="air-note">ค่าประมาณ · เกณฑ์ US AQI</div></section></header>
+      <aside class="world-clocks" aria-label="เวลาต่างประเทศ"><div class="world-heading">เวลาทั่วโลก</div><div class="world-row paris"><span class="world-city">ปารีส <span class="world-city-en" lang="en">Paris</span><small><img class="world-flag" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAxNiI+PHBhdGggZmlsbD0iIzAwMjM5NSIgZD0iTTAgMGg4djE2SDB6Ii8+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTggMGg4djE2SDh6Ii8+PHBhdGggZmlsbD0iI2VkMjkzOSIgZD0iTTE2IDBoOHYxNmgtOHoiLz48L3N2Zz4K" alt="">ฝรั่งเศส <span class="world-country-en" lang="en">· France</span></small></span><time class="world-time" id="paris-time">--:--</time></div><div class="world-row london"><span class="world-city">ลอนดอน <span class="world-city-en" lang="en">London</span><small><img class="world-flag" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAxNiI+PGRlZnM+PGNsaXBQYXRoIGlkPSJmcmFtZSI+PHBhdGggZD0iTTAgMGgyNHYxNkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNmcmFtZSkiPjxwYXRoIGZpbGw9IiMwMTIxNjkiIGQ9Ik0wIDBoMjR2MTZIMHoiLz48cGF0aCBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNSIgZD0ibS0yLTIgMjggMjBNMjYtMi0yIDE4Ii8+PHBhdGggc3Ryb2tlPSIjYzgxMDJlIiBzdHJva2Utd2lkdGg9IjIiIGQ9Im0tMi0yIDI4IDIwTTI2LTItMiAxOCIvPjxwYXRoIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2IiBkPSJNMTIgMHYxNk0wIDhoMjQiLz48cGF0aCBzdHJva2U9IiNjODEwMmUiIHN0cm9rZS13aWR0aD0iMyIgZD0iTTEyIDB2MTZNMCA4aDI0Ii8+PC9nPjwvc3ZnPgo=" alt="">สหราชอาณาจักร <span class="world-country-en" lang="en">· United Kingdom</span></small></span><time class="world-time" id="london-time">--:--</time></div><div class="world-row new-york"><span class="world-city">นิวยอร์ก <span class="world-city-en" lang="en">New York</span><small><img class="world-flag" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAxNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGgyNHYxNkgweiIvPjxwYXRoIHN0cm9rZT0iI2IyMjIzNCIgc3Ryb2tlLXdpZHRoPSIxLjIzIiBkPSJNMCAuNjE1aDI0TTAgMy4wNzVoMjRNMCA1LjUzNWgyNE0wIDcuOTk1aDI0TTAgMTAuNDU1aDI0TTAgMTIuOTE1aDI0TTAgMTUuMzg1aDI0Ii8+PHBhdGggZmlsbD0iIzNjM2I2ZSIgZD0iTTAgMGgxMHY4LjZIMHoiLz48ZyBmaWxsPSIjZmZmIj48Y2lyY2xlIGN4PSIxLjIiIGN5PSIxLjEiIHI9Ii4zMyIvPjxjaXJjbGUgY3g9IjMuMSIgY3k9IjEuMSIgcj0iLjMzIi8+PGNpcmNsZSBjeD0iNSIgY3k9IjEuMSIgcj0iLjMzIi8+PGNpcmNsZSBjeD0iNi45IiBjeT0iMS4xIiByPSIuMzMiLz48Y2lyY2xlIGN4PSI4LjgiIGN5PSIxLjEiIHI9Ii4zMyIvPjxjaXJjbGUgY3g9IjIuMSIgY3k9IjIuNyIgcj0iLjMzIi8+PGNpcmNsZSBjeD0iNCIgY3k9IjIuNyIgcj0iLjMzIi8+PGNpcmNsZSBjeD0iNS45IiBjeT0iMi43IiByPSIuMzMiLz48Y2lyY2xlIGN4PSI3LjgiIGN5PSIyLjciIHI9Ii4zMyIvPjxjaXJjbGUgY3g9IjEuMiIgY3k9IjQuMyIgcj0iLjMzIi8+PGNpcmNsZSBjeD0iMy4xIiBjeT0iNC4zIiByPSIuMzMiLz48Y2lyY2xlIGN4PSI1IiBjeT0iNC4zIiByPSIuMzMiLz48Y2lyY2xlIGN4PSI2LjkiIGN5PSI0LjMiIHI9Ii4zMyIvPjxjaXJjbGUgY3g9IjguOCIgY3k9IjQuMyIgcj0iLjMzIi8+PGNpcmNsZSBjeD0iMi4xIiBjeT0iNS45IiByPSIuMzMiLz48Y2lyY2xlIGN4PSI0IiBjeT0iNS45IiByPSIuMzMiLz48Y2lyY2xlIGN4PSI1LjkiIGN5PSI1LjkiIHI9Ii4zMyIvPjxjaXJjbGUgY3g9IjcuOCIgY3k9IjUuOSIgcj0iLjMzIi8+PGNpcmNsZSBjeD0iMS4yIiBjeT0iNy41IiByPSIuMzMiLz48Y2lyY2xlIGN4PSIzLjEiIGN5PSI3LjUiIHI9Ii4zMyIvPjxjaXJjbGUgY3g9IjUiIGN5PSI3LjUiIHI9Ii4zMyIvPjxjaXJjbGUgY3g9IjYuOSIgY3k9IjcuNSIgcj0iLjMzIi8+PGNpcmNsZSBjeD0iOC44IiBjeT0iNy41IiByPSIuMzMiLz48L2c+PC9zdmc+Cg==" alt="">สหรัฐฯ <span class="world-country-en" lang="en">· United States</span></small></span><time class="world-time" id="new-york-time">--:--</time></div><div class="world-row tokyo"><span class="world-city">โตเกียว <span class="world-city-en" lang="en">Tokyo</span><small><img class="world-flag" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAxNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGgyNHYxNkgweiIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iOCIgcj0iNC42IiBmaWxsPSIjYmMwMDJkIi8+PC9zdmc+Cg==" alt="">ญี่ปุ่น <span class="world-country-en" lang="en">· Japan</span></small></span><time class="world-time" id="tokyo-time">--:--</time></div><div class="world-row sydney"><span class="world-city">ซิดนีย์ <span class="world-city-en" lang="en">Sydney</span><small><img class="world-flag" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAxNiI+PHBhdGggZmlsbD0iIzAxMjE2OSIgZD0iTTAgMGgyNHYxNkgweiIvPjxkZWZzPjxjbGlwUGF0aCBpZD0iamFjayI+PHBhdGggZD0iTTAgMGgxMnY4SDB6Ii8+PC9jbGlwUGF0aD48cGF0aCBpZD0ic3RhciIgZD0iTTAtMSAuMjItLjMxIC45NS0uMzEgLjM2LjEyIC41OS44MSAwIC4zOC0uNTkuODEtLjM2LjEyLS45NS0uMzEtLjIyLS4zMVoiLz48L2RlZnM+PGcgY2xpcC1wYXRoPSJ1cmwoI2phY2spIj48cGF0aCBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMi41IiBkPSJtLTEtMSAxNCAxME0xMy0xLTEgOSIvPjxwYXRoIHN0cm9rZT0iI2M4MTAyZSIgc3Ryb2tlLXdpZHRoPSIxIiBkPSJtLTEtMSAxNCAxME0xMy0xLTEgOSIvPjxwYXRoIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBkPSJNNiAwdjhNMCA0aDEyIi8+PHBhdGggc3Ryb2tlPSIjYzgxMDJlIiBzdHJva2Utd2lkdGg9IjEuNSIgZD0iTTYgMHY4TTAgNGgxMiIvPjwvZz48ZyBmaWxsPSIjZmZmIj48dXNlIGhyZWY9IiNzdGFyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2IDExLjkpIHNjYWxlKDIuMykiLz48dXNlIGhyZWY9IiNzdGFyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxOCAyLjQpIHNjYWxlKDEuMjUpIi8+PHVzZSBocmVmPSIjc3RhciIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEgNi4xKSBzY2FsZSgxLjIpIi8+PHVzZSBocmVmPSIjc3RhciIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTggMTIuNikgc2NhbGUoMS4yNSkiLz48dXNlIGhyZWY9IiNzdGFyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNSA4LjIpIHNjYWxlKDEuMikiLz48dXNlIGhyZWY9IiNzdGFyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyMC4xIDkuNSkgc2NhbGUoLjY1KSIvPjwvZz48L3N2Zz4K" alt="">ออสเตรเลีย <span class="world-country-en" lang="en">· Australia</span></small></span><time class="world-time" id="sydney-time">--:--</time></div><div class="world-row beijing"><span class="world-city">ปักกิ่ง <span class="world-city-en" lang="en">Beijing</span><small><img class="world-flag" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAxNiI+PHBhdGggZmlsbD0iI2RlMjkxMCIgZD0iTTAgMGgyNHYxNkgweiIvPjxkZWZzPjxwYXRoIGlkPSJzdGFyIiBkPSJNMC0xIC4yMi0uMzEgLjk1LS4zMSAuMzYuMTIgLjU5LjgxIDAgLjM4LS41OS44MS0uMzYuMTItLjk1LS4zMS0uMjItLjMxWiIvPjwvZGVmcz48ZyBmaWxsPSIjZmZkZTAwIj48dXNlIGhyZWY9IiNzdGFyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg1IDUpIHNjYWxlKDMuNCkiLz48dXNlIGhyZWY9IiNzdGFyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMC41IDIuMSkgc2NhbGUoMSkiLz48dXNlIGhyZWY9IiNzdGFyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMiA0LjIpIHNjYWxlKDEpIi8+PHVzZSBocmVmPSIjc3RhciIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTIgNykgc2NhbGUoMSkiLz48dXNlIGhyZWY9IiNzdGFyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMC4zIDkuMikgc2NhbGUoMSkiLz48L2c+PC9zdmc+Cg==" alt="">จีน <span class="world-country-en" lang="en">· China</span></small></span><time class="world-time" id="beijing-time">--:--</time></div><div class="world-row los-angeles"><span class="world-city">ลอสแอนเจลิส <span class="world-city-en" lang="en">Los Angeles</span><small><img class="world-flag" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAxNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGgyNHYxNkgweiIvPjxwYXRoIHN0cm9rZT0iI2IyMjIzNCIgc3Ryb2tlLXdpZHRoPSIxLjIzIiBkPSJNMCAuNjE1aDI0TTAgMy4wNzVoMjRNMCA1LjUzNWgyNE0wIDcuOTk1aDI0TTAgMTAuNDU1aDI0TTAgMTIuOTE1aDI0TTAgMTUuMzg1aDI0Ii8+PHBhdGggZmlsbD0iIzNjM2I2ZSIgZD0iTTAgMGgxMHY4LjZIMHoiLz48ZyBmaWxsPSIjZmZmIj48Y2lyY2xlIGN4PSIxLjIiIGN5PSIxLjEiIHI9Ii4zMyIvPjxjaXJjbGUgY3g9IjMuMSIgY3k9IjEuMSIgcj0iLjMzIi8+PGNpcmNsZSBjeD0iNSIgY3k9IjEuMSIgcj0iLjMzIi8+PGNpcmNsZSBjeD0iNi45IiBjeT0iMS4xIiByPSIuMzMiLz48Y2lyY2xlIGN4PSI4LjgiIGN5PSIxLjEiIHI9Ii4zMyIvPjxjaXJjbGUgY3g9IjIuMSIgY3k9IjIuNyIgcj0iLjMzIi8+PGNpcmNsZSBjeD0iNCIgY3k9IjIuNyIgcj0iLjMzIi8+PGNpcmNsZSBjeD0iNS45IiBjeT0iMi43IiByPSIuMzMiLz48Y2lyY2xlIGN4PSI3LjgiIGN5PSIyLjciIHI9Ii4zMyIvPjxjaXJjbGUgY3g9IjEuMiIgY3k9IjQuMyIgcj0iLjMzIi8+PGNpcmNsZSBjeD0iMy4xIiBjeT0iNC4zIiByPSIuMzMiLz48Y2lyY2xlIGN4PSI1IiBjeT0iNC4zIiByPSIuMzMiLz48Y2lyY2xlIGN4PSI2LjkiIGN5PSI0LjMiIHI9Ii4zMyIvPjxjaXJjbGUgY3g9IjguOCIgY3k9IjQuMyIgcj0iLjMzIi8+PGNpcmNsZSBjeD0iMi4xIiBjeT0iNS45IiByPSIuMzMiLz48Y2lyY2xlIGN4PSI0IiBjeT0iNS45IiByPSIuMzMiLz48Y2lyY2xlIGN4PSI1LjkiIGN5PSI1LjkiIHI9Ii4zMyIvPjxjaXJjbGUgY3g9IjcuOCIgY3k9IjUuOSIgcj0iLjMzIi8+PGNpcmNsZSBjeD0iMS4yIiBjeT0iNy41IiByPSIuMzMiLz48Y2lyY2xlIGN4PSIzLjEiIGN5PSI3LjUiIHI9Ii4zMyIvPjxjaXJjbGUgY3g9IjUiIGN5PSI3LjUiIHI9Ii4zMyIvPjxjaXJjbGUgY3g9IjYuOSIgY3k9IjcuNSIgcj0iLjMzIi8+PGNpcmNsZSBjeD0iOC44IiBjeT0iNy41IiByPSIuMzMiLz48L2c+PC9zdmc+Cg==" alt="">สหรัฐฯ <span class="world-country-en" lang="en">· United States</span></small></span><time class="world-time" id="los-angeles-time">--:--</time></div></aside>
+      <section class="main" aria-label="เวลาท้องถิ่น"><p class="eyebrow">เวลาที่บ้าน</p><div class="clock-group"><h1 class="time"><span id="local-hours">--</span><span class="colon">:</span><span id="local-minutes">--</span><span class="seconds" id="local-seconds">--</span></h1><div class="date" id="local-date">กำลังอ่านเวลา...</div><div class="date-english" id="local-date-en">Loading date...</div></div><div class="subdate" id="local-subdate">พักสายตาสักครู่ แล้วมองออกไปนอกหน้าต่าง</div></section>
       <aside class="aside">
-        <section class="card" aria-label="พยากรณ์อากาศ"><div class="card-head"><span>อากาศตอนนี้</span><span class="weather-mark" id="weather-icon" aria-hidden="true">◌</span></div><div class="temp" id="temperature">--°</div><div class="condition" id="condition">รอข้อมูลตำแหน่ง</div><div class="weather-details"><span id="feels">รู้สึกเหมือน --°</span><span id="range">สูงสุด --° · ต่ำสุด --°</span><span id="rain-chance">ฝน --%</span></div><div class="city" id="city">กรุณาเปิดตำแหน่ง</div></section>
-        <section class="card" aria-label="เวลาปารีส"><div class="paris-label"><span class="dot"></span>Paris · France</div><div class="paris-time" id="paris-time">--:--</div><div class="paris-date" id="paris-date">กำลังอ่านเวลา...</div></section>
+        <section class="card astro-card sun-card" aria-label="ดวงอาทิตย์"><div class="astro-title">☀ ดวงอาทิตย์</div><div class="astro-compact"><div class="sun-graphic" aria-hidden="true"><div class="sun-horizon"></div><div class="sun-orb" id="sun-orb"></div></div><div class="astro-times"><div><span class="astro-time-label">ขึ้น</span><span class="astro-time-value" id="sunrise">--:--</span></div><div><span class="astro-time-label">ตก</span><span class="astro-time-value" id="sunset">--:--</span></div></div></div></section>
+        <section class="card astro-card moon-card" aria-label="ดวงจันทร์"><div class="astro-title">☾ ดวงจันทร์</div><div class="astro-compact"><div class="moon-main"><canvas class="moon-disc" id="moon-disc" width="112" height="112" role="img" aria-label="ข้างขึ้นข้างแรม"></canvas><div><div class="moon-percent" id="moon-illumination">--%</div><div class="moon-caption">ส่วนที่สว่างของดวงจันทร์</div></div></div><div class="astro-times"><div><span class="astro-time-label">ขึ้น</span><span class="astro-time-value" id="moonrise">--:--</span></div><div><span class="astro-time-label">ตก</span><span class="astro-time-value" id="moonset">--:--</span></div></div></div></section>
+        <section class="card lunar-card" aria-label="ปฏิทินจันทรคติไทย"><div class="astro-title">◐ ปฏิทินจันทรคติ</div><div class="lunar-main"><div class="lunar-date" id="lunar-date">กำลังอ่านวัน...</div><div class="lunar-month" id="lunar-month"></div></div><div class="wan-phra-status" id="wan-phra-status" role="status">กำลังตรวจวันพระ</div></section>
       </aside>
-      <footer class="bottomline"><div class="credit"><span>อากาศ:</span><a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a></div><div class="controls"><button class="icon-button" id="fullscreen" type="button" title="เต็มจอ" aria-label="เต็มจอ">⛶</button><button class="icon-button" id="settings" type="button" title="ตั้งค่า" aria-label="ตั้งค่า">⚙</button></div></footer>
+      <footer class="bottomline"><div class="credit"><span>ข้อมูล:</span><a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a><span>·</span><a href="https://atmosphere.copernicus.eu/" target="_blank" rel="noopener noreferrer">CAMS</a><span>·</span><span id="status" role="status">พร้อมใช้งาน</span></div><div class="controls"><button class="icon-button" id="fullscreen" type="button" title="เต็มจอ" aria-label="เต็มจอ">⛶</button><button class="icon-button" id="settings" type="button" title="ตั้งค่า" aria-label="ตั้งค่า">⚙</button></div></footer>
     </main>
-    <div class="setup" id="setup"><div class="symbol">☀</div><h2>นาฬิกาที่บ้าน</h2><p>ให้แท็บเล็ตใช้ตำแหน่งเพื่อแสดงอากาศใกล้บ้านคุณ เวลาปารีสจะอัปเดตอัตโนมัติ</p><button class="solid-button" id="start" type="button">เริ่มใช้งานและเปิดตำแหน่ง</button><button class="link-button" id="manual" type="button">เลือกเมืองเอง</button></div>
+    <div class="setup" id="setup"><div class="symbol">☀</div><h2>นาฬิกาที่บ้าน</h2><p>ให้แท็บเล็ตใช้ตำแหน่งเพื่อแสดงอากาศใกล้บ้านคุณ เวลาต่างประเทศจะอัปเดตอัตโนมัติ</p><button class="solid-button" id="start" type="button">เริ่มใช้งานและเปิดตำแหน่ง</button><button class="link-button" id="manual" type="button">เลือกเมืองเอง</button></div>
   </div>
   <dialog id="settings-dialog" aria-labelledby="settings-title"><h2 id="settings-title">ตั้งค่านาฬิกา</h2><p>เลือกเมืองสำหรับอากาศ หรือใช้ตำแหน่งของแท็บเล็ต</p><button class="solid-button wide" id="use-location" type="button">ใช้ตำแหน่งปัจจุบัน</button><label class="field-label" for="city-search">ค้นหาเมือง</label><div class="search-row"><input id="city-search" placeholder="เช่น เชียงใหม่ หรือ Bangkok" autocomplete="off"><button id="search" type="button">ค้นหา</button></div><div class="results" id="results"></div><div class="setting-note" id="setting-note">ตำแหน่งจะเก็บในเบราว์เซอร์ของเครื่องนี้เท่านั้น</div><label class="toggle-row" for="keep-awake"><span>คงหน้าจอเปิดขณะใช้งาน</span><input id="keep-awake" type="checkbox" checked></label><div class="dialog-actions"><button id="close-settings" type="button">ปิด</button></div></dialog>
+  <script src="./suncalc.js?v=2"></script>
+  <script src="./thai-lunar.js?v=1"></script>
   <script>
     'use strict';
     const $ = id => document.getElementById(id);
     const app = $('app');
     const saved = (() => { try { return JSON.parse(localStorage.getItem('homeClockLocation')); } catch { return null; } })();
     let place = saved && Number.isFinite(saved.latitude) && Number.isFinite(saved.longitude) ? saved : null;
-    let weatherTimer = null, wakeLock = null, keepAwake = true;
+    let weatherTimer = null, wakeLock = null, keepAwake = true, astroDay = null, moonHour = null, clockMinute = null;
     const dateFormat = new Intl.DateTimeFormat('th-TH', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
-    const parisTimeFormat = new Intl.DateTimeFormat('en-GB', {timeZone:'Europe/Paris',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
-    const parisDateFormat = new Intl.DateTimeFormat('th-TH', {timeZone:'Europe/Paris',weekday:'long',day:'numeric',month:'long'});
+    const englishDateFormat = new Intl.DateTimeFormat('en-GB', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    const worldClocks = [
+      ['paris-time','Europe/Paris',48.86,2.35],['london-time','Europe/London',51.51,-.13],
+      ['new-york-time','America/New_York',40.71,-74.01],['tokyo-time','Asia/Tokyo',35.68,139.69],
+      ['sydney-time','Australia/Sydney',-33.87,151.21],['beijing-time','Asia/Shanghai',39.90,116.41],
+      ['los-angeles-time','America/Los_Angeles',34.05,-118.24]
+    ].map(([id,timeZone,latitude,longitude]) => ({id,latitude,longitude,row:$(id).closest('.world-row'),format:new Intl.DateTimeFormat('en-GB',{timeZone,hour:'2-digit',minute:'2-digit',hourCycle:'h23'})}));
     const two = n => String(n).padStart(2,'0');
+    const thaiDigits = value => String(value).replace(/[0-9]/g,digit=>'๐๑๒๓๔๕๖๗๘๙'[Number(digit)]);
+    function updateLunar(now){
+      const [year,month,day]=localDay(now,'Asia/Bangkok').split('-').map(Number);
+      const lunar=window.ThaiLunar?.fromGregorian(year,month,day);
+      if(!lunar){$('lunar-date').textContent='ไม่มีข้อมูล';$('lunar-month').textContent='';$('wan-phra-status').textContent='ตรวจวันพระไม่ได้';return;}
+      $('lunar-date').textContent=lunar.phase+' '+thaiDigits(lunar.day)+' ค่ำ';
+      $('lunar-month').textContent='เดือน '+thaiDigits(lunar.month);
+      let nextHoly=null;
+      if(!lunar.isWanPhra){
+        for(let offset=1;offset<=8;offset++){
+          const candidate=new Date(Date.UTC(year,month-1,day+offset));
+          if(window.ThaiLunar.fromGregorian(candidate.getUTCFullYear(),candidate.getUTCMonth()+1,candidate.getUTCDate())?.isWanPhra){nextHoly=candidate;break;}
+        }
+      }
+      const nextLabel=nextHoly ? thaiDigits(new Intl.DateTimeFormat('th-TH',{day:'numeric',month:'short',timeZone:'UTC'}).format(nextHoly)) : '';
+      $('wan-phra-status').textContent=lunar.isWanPhra ? '● วันนี้วันพระ' : nextHoly ? 'วันพระถัดไป '+nextLabel : 'ยังไม่ทราบวันพระถัดไป';
+      $('wan-phra-status').classList.toggle('is-holy',lunar.isWanPhra);
+    }
     function updateClock(){
       const now = new Date();
+      $('local-seconds').textContent = two(now.getSeconds());
+      const minuteStamp=Math.floor(now.getTime()/60000);
+      if(minuteStamp===clockMinute) return;
+      clockMinute=minuteStamp;
       $('local-hours').textContent = two(now.getHours()); $('local-minutes').textContent = two(now.getMinutes());
       $('local-date').textContent = dateFormat.format(now);
-      $('paris-time').textContent = parisTimeFormat.format(now);
-      $('paris-date').textContent = parisDateFormat.format(now);
+      $('local-date-en').textContent = englishDateFormat.format(now);
+      for(const clock of worldClocks){
+        const time=clock.format.format(now);
+        $(clock.id).textContent=time;
+        const sunlight=typeof window.SunCalc?.getPosition==='function' ? SunCalc.getPosition(now,clock.latitude,clock.longitude).altitude : NaN;
+        const isDay=Number.isFinite(sunlight) ? sunlight>0 : Number(time.slice(0,2))>=6 && Number(time.slice(0,2))<18;
+        clock.row.dataset.daylight=isDay ? 'day' : 'night';
+      }
+      updateLunar(now);
       const hour = now.getHours();
       $('local-subdate').textContent = hour >= 20 || hour < 6 ? 'ยามค่ำคืน · ลดความสว่างหน้าจอเพื่อพักสายตา' : 'วันนี้เป็นวันที่ดีสำหรับการหยุดพักสักครู่';
       setScene(app.dataset.weather || 'clear');
+      if(place && astroDay?.date !== localDay(now,astroDay?.timezone || place.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone)) updateAstronomy({},astroDay?.timezone || place.timezone);
+      updateSunPosition();
+      if(place && window.SunCalc && now.getHours() !== moonHour) updateMoonIllumination();
     }
     function setScene(weather){
       const hour = new Date().getHours(), night = hour >= 19 || hour < 6;
-      const nextClass = 'app weather-' + (night ? 'night' : weather);
+      const nextClass = 'app weather-' + weather + (night ? ' is-night' : '');
       if(app.className !== nextClass) app.className = nextClass;
     }
     function weatherInfo(code){
@@ -84,20 +199,119 @@
       if(code === 3) return {text:'เมฆมาก',icon:'☁',scene:'cloud'};
       if([45,48].includes(code)) return {text:'มีหมอก',icon:'≋',scene:'cloud'};
       if([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) return {text:'มีฝน',icon:'☂',scene:'rain'};
-      if([71,73,75,77,85,86].includes(code)) return {text:'มีหิมะ',icon:'❄',scene:'cloud'};
-      if([95,96,99].includes(code)) return {text:'ฝนฟ้าคะนอง',icon:'ϟ',scene:'rain'};
+      if([71,73,75,77,85,86].includes(code)) return {text:'มีหิมะ',icon:'❄',scene:'snow'};
+      if([95,96,99].includes(code)) return {text:'ฝนฟ้าคะนอง',icon:'ϟ',scene:'thunder'};
       return {text:'อากาศแปรปรวน',icon:'◌',scene:'cloud'};
     }
     function fmtTemp(n){ return Number.isFinite(n) ? Math.round(n) + '°' : '--°'; }
+    function airLevel(aqi){
+      if(!Number.isFinite(aqi)) return {key:'unknown',label:'ไม่มีระดับ',bars:0};
+      if(aqi<=50) return {key:'good',label:'ดี',bars:1};
+      if(aqi<=100) return {key:'moderate',label:'ปานกลาง',bars:2};
+      if(aqi<=150) return {key:'sensitive',label:'กระทบกลุ่มเสี่ยง',bars:3};
+      if(aqi<=200) return {key:'unhealthy',label:'ไม่ดีต่อสุขภาพ',bars:4};
+      if(aqi<=300) return {key:'very-unhealthy',label:'แย่มาก',bars:5};
+      return {key:'hazardous',label:'อันตราย',bars:6};
+    }
+    function showAirQuality(pm,aqi,note='ค่าประมาณ · เกณฑ์ US AQI'){
+      const level=airLevel(aqi);
+      $('air-quality').dataset.level=level.key;
+      $('air-number').textContent=Number.isFinite(pm) ? Math.round(pm) : '--';
+      $('air-label').textContent=Number.isFinite(pm) ? level.label : 'ไม่มีข้อมูล';
+      $('air-bars').querySelectorAll('i').forEach((bar,index)=>bar.classList.toggle('is-active',index<level.bars && Number.isFinite(pm)));
+      $('air-note').textContent=note;
+      $('air-quality').setAttribute('aria-label',Number.isFinite(pm) ? `ฝุ่น PM2.5 ${Math.round(pm)} ไมโครกรัมต่อลูกบาศก์เมตร ระดับ${level.label} ตามดัชนี US AQI` : 'ฝุ่น PM2.5 ไม่มีข้อมูล');
+    }
+    async function fetchAirQuality(location){
+      const key=`${location.latitude.toFixed(4)},${location.longitude.toFixed(4)}`;
+      const cached=(()=>{try{return JSON.parse(localStorage.getItem('homeClockAirQuality'));}catch{return null;}})();
+      const usableCache=cached?.key===key && Date.now()-cached.time<24*60*60*1000 && Number.isFinite(cached.pm);
+      if(usableCache) showAirQuality(cached.pm,cached.aqi,'ข้อมูลเดิม · กำลังอัปเดต');
+      else showAirQuality(NaN,NaN,'กำลังโหลดข้อมูล');
+      try{
+        const params=new URLSearchParams({latitude:String(location.latitude),longitude:String(location.longitude),current:'pm2_5,us_aqi_pm2_5',timezone:'auto'});
+        const response=await fetch('https://air-quality-api.open-meteo.com/v1/air-quality?'+params,{cache:'no-store'});
+        if(!response.ok) throw new Error('air quality request failed');
+        const data=await response.json(),pm=data.current?.pm2_5,aqi=data.current?.us_aqi_pm2_5;
+        if(!Number.isFinite(pm)) throw new Error('air quality unavailable');
+        if(place!==location) return;
+        showAirQuality(pm,aqi);
+        try{localStorage.setItem('homeClockAirQuality',JSON.stringify({key,time:Date.now(),pm,aqi}));}catch{}
+      }catch{
+        if(place!==location) return;
+        if(usableCache) showAirQuality(cached.pm,cached.aqi,'ข้อมูลเดิม · อัปเดตไม่ได้');
+        else showAirQuality(NaN,NaN,'เชื่อมต่อข้อมูลไม่ได้');
+      }
+    }
     function setStatus(message){ $('status').textContent = message; }
+    const localDay = (date, timeZone) => {const parts=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(date).map(part=>[part.type,part.value]));return `${parts.year}-${parts.month}-${parts.day}`;};
+    const clockAt = (date, timeZone) => new Intl.DateTimeFormat('en-GB',{timeZone,hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(date);
+    const timeMinutes = time => {const [h,m] = time.split(':').map(Number);return h * 60 + m;};
+    function updateSunPosition(){
+      if(!astroDay?.sunrise || !astroDay?.sunset) return;
+      const now = clockAt(new Date(),astroDay.timezone);
+      const start = timeMinutes(astroDay.sunrise), end = timeMinutes(astroDay.sunset);
+      if(end <= start) return;
+      const progress = Math.max(0,Math.min(1,(timeMinutes(now)-start)/(end-start)));
+      $('sun-orb').style.setProperty('--sun-position', (10 + progress * 80) + '%');
+      $('sun-orb').style.opacity = timeMinutes(now) < start || timeMinutes(now) > end ? '.26' : '1';
+    }
+    function drawMoon(phase){
+      const canvas=$('moon-disc'),ctx=canvas.getContext('2d'); if(!ctx) return;
+      const size=canvas.width, center=size/2, radius=size*.49, pixels=ctx.createImageData(size,size);
+      for(let y=0;y<size;y++) for(let x=0;x<size;x++){
+        const dy=y-center,dx=x-center,limit=Math.sqrt(Math.max(0,radius*radius-dy*dy));
+        if(dx*dx+dy*dy>radius*radius) continue;
+        const edge=Math.cos(2*Math.PI*phase)*limit;
+        const lit=phase<.5 ? dx>=edge : dx<=-edge;
+        const fade=Math.round((dx*dx+dy*dy)/(radius*radius)*22);
+        const i=(y*size+x)*4; pixels.data[i]=lit ? 219-fade : 40;pixels.data[i+1]=lit ? 209-fade : 38;pixels.data[i+2]=lit ? 165-fade : 30;pixels.data[i+3]=255;
+      }
+      ctx.putImageData(pixels,0,0);
+    }
+    function updateMoonIllumination(){
+      if(!window.SunCalc) return;
+      const illumination=SunCalc.getMoonIllumination(new Date());
+      moonHour=new Date().getHours();
+      $('moon-illumination').textContent=Math.round(illumination.fraction*100)+'%';
+      $('moon-disc').setAttribute('aria-label','ดวงจันทร์สว่าง '+Math.round(illumination.fraction*100)+' เปอร์เซ็นต์');
+      drawMoon(illumination.phase);
+    }
+    function updateAstronomy(daily, timezone){
+      const zone=timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+      const day=localDay(new Date(),zone);
+      let sunrise=daily.time?.[0]===day ? daily.sunrise?.[0]?.slice(11,16) : null;
+      let sunset=daily.time?.[0]===day ? daily.sunset?.[0]?.slice(11,16) : null;
+      if(!window.SunCalc){$('sunrise').textContent=sunrise || '—';$('sunset').textContent=sunset || '—';$('moonrise').textContent='—';$('moonset').textContent='—';$('moon-illumination').textContent='—';astroDay={date:day,timezone:zone,sunrise,sunset};return;}
+      updateMoonIllumination();
+      const [year,month,date]=day.split('-').map(Number), events={rise:[],set:[]};
+      for(let offset=-1;offset<=1;offset++){
+        const anchor=new Date(Date.UTC(year,month-1,date+offset,12));
+        const times=SunCalc.getMoonTimes(anchor,place.latitude,place.longitude);
+        for(const kind of ['rise','set']) if(times[kind] instanceof Date && localDay(times[kind],zone)===day) events[kind].push(times[kind]);
+        if(!sunrise || !sunset){
+          const sun=SunCalc.getTimes(anchor,place.latitude,place.longitude);
+          if(!sunrise && sun.sunrise && localDay(sun.sunrise,zone)===day) sunrise=clockAt(sun.sunrise,zone);
+          if(!sunset && sun.sunset && localDay(sun.sunset,zone)===day) sunset=clockAt(sun.sunset,zone);
+        }
+      }
+      $('sunrise').textContent=sunrise || 'ไม่มีวันนี้';$('sunset').textContent=sunset || 'ไม่มีวันนี้';
+      astroDay={date:day,timezone:zone,sunrise,sunset};updateSunPosition();
+      for(const [kind,id] of [['rise','moonrise'],['set','moonset']]){
+        const unique=[...new Map(events[kind].map(value=>[value.getTime(),value])).values()].sort((a,b)=>a-b);
+        $(id).textContent=unique.length ? clockAt(unique[0],zone) : 'ไม่มีวันนี้';
+      }
+    }
     async function fetchWeather(){
       if(!place) return;
-      const params = new URLSearchParams({latitude:String(place.latitude),longitude:String(place.longitude),current:'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code',daily:'temperature_2m_max,temperature_2m_min,precipitation_probability_max',forecast_days:'1',timezone:'auto'});
+      fetchAirQuality(place);
+      const params = new URLSearchParams({latitude:String(place.latitude),longitude:String(place.longitude),current:'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code',daily:'temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset',forecast_days:'1',timezone:'auto'});
       setStatus('กำลังอัปเดตอากาศ');
       try{
         const response = await fetch('https://api.open-meteo.com/v1/forecast?' + params, {cache:'no-store'});
         if(!response.ok) throw new Error('weather request failed');
         const data = await response.json();
+        if(data.timezone && place.timezone!==data.timezone){place.timezone=data.timezone;try{localStorage.setItem('homeClockLocation',JSON.stringify(place));}catch{}}
         const current = data.current || {}, daily = data.daily || {};
         const code = weatherInfo(current.weather_code);
         $('temperature').textContent = fmtTemp(current.temperature_2m);
@@ -109,19 +323,22 @@
         $('rain-chance').textContent = 'ฝน ' + (Number.isFinite(rain) ? rain + '%' : '--%');
         $('city').textContent = place.name;
         app.dataset.weather = code.scene; setScene(code.scene);
+        updateAstronomy(daily,data.timezone);
         setStatus('อัปเดตอากาศ ' + two(new Date().getHours()) + ':' + two(new Date().getMinutes()));
-        try { localStorage.setItem('homeClockWeather', JSON.stringify({time:Date.now(),data:{temperature:$('temperature').textContent,condition:code.text,icon:code.icon,feels:$('feels').textContent,range:$('range').textContent,rain:$('rain-chance').textContent,scene:code.scene,name:place.name}})); } catch {}
+        try { localStorage.setItem('homeClockWeather', JSON.stringify({time:Date.now(),data:{temperature:$('temperature').textContent,condition:code.text,icon:code.icon,feels:$('feels').textContent,range:$('range').textContent,rain:$('rain-chance').textContent,scene:code.scene,name:place.name,daily,timezone:data.timezone}})); } catch {}
       }catch{
         const cache = (()=>{try{return JSON.parse(localStorage.getItem('homeClockWeather'));}catch{return null;}})();
         if(cache?.data && cache.data.name === place.name){
           $('temperature').textContent=cache.data.temperature; $('condition').textContent=cache.data.condition; $('weather-icon').textContent=cache.data.icon; $('feels').textContent=cache.data.feels; $('range').textContent=cache.data.range; $('rain-chance').textContent=cache.data.rain; $('city').textContent=place.name; app.dataset.weather=cache.data.scene; setScene(cache.data.scene);
+          updateAstronomy(cache.data.daily || {},cache.data.timezone || place.timezone);
           setStatus('ข้อมูลอากาศล่าสุดที่บันทึกไว้');
-        }else { $('condition').textContent='เชื่อมต่อข้อมูลอากาศไม่ได้'; $('city').textContent=place.name; setStatus('ลองอัปเดตอีกครั้ง'); }
+        }else { $('condition').textContent='เชื่อมต่อข้อมูลอากาศไม่ได้'; $('city').textContent=place.name; updateAstronomy({},place.timezone); setStatus('ลองอัปเดตอีกครั้ง'); }
       }
     }
     function setPlace(next){
       place = next; try {localStorage.setItem('homeClockLocation',JSON.stringify(place));}catch{}
       $('setup').hidden = true; if($('settings-dialog').open) $('settings-dialog').close();
+      updateAstronomy({},place.timezone);
       fetchWeather(); clearInterval(weatherTimer); weatherTimer = setInterval(fetchWeather,20*60*1000);
     }
     function locate(){
@@ -140,7 +357,7 @@
         const response=await fetch(url); if(!response.ok)throw new Error('geocoding failed');
         const results=(await response.json()).results || []; $('results').textContent='';
         if(!results.length){$('results').textContent='ไม่พบเมือง ลองสะกดเป็นภาษาอังกฤษ';return;}
-        for(const item of results){const b=document.createElement('button'); b.type='button';b.className='result';b.textContent=[item.name,item.admin1,item.country].filter(Boolean).join(' · ');b.addEventListener('click',()=>setPlace({latitude:item.latitude,longitude:item.longitude,name:[item.name,item.country].filter(Boolean).join(', ')}));$('results').append(b);}
+        for(const item of results){const b=document.createElement('button'); b.type='button';b.className='result';b.textContent=[item.name,item.admin1,item.country].filter(Boolean).join(' · ');b.addEventListener('click',()=>setPlace({latitude:item.latitude,longitude:item.longitude,name:[item.name,item.country].filter(Boolean).join(', '),timezone:item.timezone}));$('results').append(b);}
       }catch{$('results').textContent='ค้นหาไม่ได้ กรุณาตรวจสอบอินเทอร์เน็ต';}
     }
     async function requestWakeLock(){
@@ -159,8 +376,8 @@
     $('fullscreen').addEventListener('click',()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.().catch(()=>{});else document.exitFullscreen?.();requestWakeLock();});
     document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){updateClock();fetchWeather();requestWakeLock();}});
     let drift=0; function shift(){drift=(drift+1)%9;const positions=[[0,0],[8,-5],[-7,4],[5,7],[-8,-4],[3,-8],[9,3],[-4,7],[0,0]];$('frame').style.transform=`translate(${positions[drift][0]}px,${positions[drift][1]}px)`;}
-    updateClock();setInterval(updateClock,10000);setInterval(shift,5*60*1000);
-    if(place){$('setup').hidden=true;fetchWeather();weatherTimer=setInterval(fetchWeather,20*60*1000);}
+    updateClock();setInterval(updateClock,1000);setInterval(shift,5*60*1000);
+    if(place){$('setup').hidden=true;updateAstronomy({},place.timezone);fetchWeather();weatherTimer=setInterval(fetchWeather,20*60*1000);}
   </script>
 </body>
 </html>
